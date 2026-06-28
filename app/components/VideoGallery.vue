@@ -64,12 +64,14 @@ onMounted(() => {
 
 <template>
   <section class="section section--gallery">
-    <div class="gallery-container">
+    <div class="gallery-header">
       <h2 class="gallery-title">Галерея</h2>
-      
-      <!-- ClientOnly предотвращает ошибки гидратации (SSR), так как мы используем Math.random() -->
-      <ClientOnly>
-        <div class="gallery-grid" v-if="galleryItems.length > 0">
+    </div>
+    
+    <!-- ClientOnly предотвращает ошибки гидратации (SSR), так как мы используем Math.random() -->
+    <ClientOnly>
+      <div class="gallery-scroll-wrapper" v-if="galleryItems.length > 0">
+        <div class="gallery-grid">
           <div 
             v-for="(item, index) in galleryItems" 
             :key="index"
@@ -88,8 +90,8 @@ onMounted(() => {
             <div class="gallery-item-overlay"></div>
           </div>
         </div>
-      </ClientOnly>
-    </div>
+      </div>
+    </ClientOnly>
   </section>
 </template>
 
@@ -100,14 +102,15 @@ onMounted(() => {
   width: 100%;
   display: flex;
   flex-direction: column;
-  padding: 80px 20px;
+  padding: 80px 0;
   background-color: transparent;
 }
 
-.gallery-container {
+.gallery-header {
   max-width: 1400px;
   margin: 0 auto;
   width: 100%;
+  padding: 0 20px;
 }
 
 .gallery-title {
@@ -120,17 +123,31 @@ onMounted(() => {
   letter-spacing: 2px;
 }
 
+.gallery-scroll-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 30px;
+  padding-top: 10px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.gallery-scroll-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
 .gallery-grid {
   display: grid;
-  /* 4 колонки: это идеальная основа для мозаики (bento box) */
-  grid-template-columns: repeat(4, 1fr);
-  /* Высота ячейки динамическая. Чтобы поддерживать пропорции вертикального видео 9:16:
-     мы делаем ряды немного выше, чтобы ячейки были вертикальными прямоугольниками */
-  grid-auto-rows: 450px;
+  /* Высота мозаики - 2 ряда (максимальный размер большого формата) */
+  grid-template-rows: repeat(2, 350px);
+  /* Ширина базовой ячейки */
+  grid-auto-columns: 218px;
   gap: 16px;
-  width: 100%;
-  /* Магия CSS Grid: dense flow автоматически заполняет "дыры" в сетке мелкими элементами! */
-  grid-auto-flow: dense;
+  width: max-content;
+  /* Мозаика заполняется по колонкам (слева направо) */
+  grid-auto-flow: column dense;
+  padding: 0 40px;
 }
 
 .gallery-item {
@@ -141,6 +158,8 @@ onMounted(() => {
   border: 1px solid rgba(255, 255, 255, 0.1);
   transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.3s ease;
   cursor: pointer;
+  /* Для Safari баг-фикс с overflow: hidden и border-radius */
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
 }
 
 .gallery-item:hover {
@@ -157,7 +176,6 @@ onMounted(() => {
 .gallery-video {
   width: 100%;
   height: 100%;
-  /* object-fit: cover обрезает края, чтобы заполнить ячейку без искажений */
   object-fit: cover; 
   display: block;
 }
@@ -175,52 +193,44 @@ onMounted(() => {
 }
 
 /* --- РАЗМЕРЫ МОЗАИКИ --- */
-/* Маленькая картинка (1х1). Сохраняет базовую пропорцию ячейки. */
 .gallery-item--small {
-  grid-column: span 1;
   grid-row: span 1;
+  grid-column: span 1;
 }
 
-/* Самая большая картинка: 2x2. Занимает площадь как 4 маленьких. Сохраняет ту же пропорцию! */
 .gallery-item--large {
-  grid-column: span 2;
   grid-row: span 2;
+  grid-column: span 2;
 }
 
 /* --- АДАПТИВ --- */
 @media (max-width: 1200px) {
   .gallery-grid {
-    grid-auto-rows: 400px;
+    grid-template-rows: repeat(2, 300px);
+    grid-auto-columns: 186px;
   }
 }
 
 @media (max-width: 1024px) {
   .gallery-grid {
-    /* Переходим на 3 колонки */
-    grid-template-columns: repeat(3, 1fr);
-    grid-auto-rows: 350px;
+    grid-template-rows: repeat(2, 250px);
+    grid-auto-columns: 155px;
   }
 }
 
 @media (max-width: 768px) {
   .gallery-grid {
-    /* Переходим на 2 колонки */
-    grid-template-columns: repeat(2, 1fr);
-    grid-auto-rows: 450px;
-  }
-  .gallery-item--large {
-    grid-column: span 2;
+    grid-template-rows: repeat(2, 200px);
+    grid-auto-columns: 124px;
+    padding: 0 20px;
   }
 }
 
 @media (max-width: 480px) {
   .gallery-grid {
-    grid-template-columns: 1fr;
-    grid-auto-rows: 500px;
-  }
-  .gallery-item {
-    grid-column: span 1 !important;
-    grid-row: span 1 !important;
+    grid-template-rows: repeat(2, 180px);
+    grid-auto-columns: 112px;
+    padding: 0 16px;
   }
 }
 </style>

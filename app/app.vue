@@ -10,11 +10,7 @@
     <div class="hero-wrapper" :class="{ 'hero-visible': preloaderFinished }">
       <AppHeader />
 
-      <!-- Имитация видео-фона -->
-      <div class="video-overlay"></div>
-      <video class="bg-video" autoplay loop muted playsinline>
-        <source src="https://assets.mixkit.co/videos/preview/mixkit-girl-dancing-in-a-dark-room-41372-large.mp4" type="video/mp4" />
-      </video>
+
 
       <main class="content">
         <h1 class="title">
@@ -76,25 +72,6 @@ function onPreloaderComplete() {
   filter: blur(0px);
 }
 
-.bg-video {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  min-width: 100%;
-  min-height: 100%;
-  width: auto;
-  height: auto;
-  transform: translate(-50%, -50%);
-  z-index: -2;
-  filter: grayscale(80%) contrast(1.2); 
-}
-
-.video-overlay {
-  position: absolute;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: linear-gradient(135deg, rgba(5,5,5,0.9) 0%, rgba(5,5,5,0.6) 100%);
-  z-index: -1;
-}
 
 .content {
   text-align: center;
@@ -144,7 +121,7 @@ function onPreloaderComplete() {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.2) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
   background-size: 20px 20px;
   pointer-events: none;
   z-index: 0;
