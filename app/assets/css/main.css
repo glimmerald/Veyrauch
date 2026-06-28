@@ -1,0 +1,87 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+
+:root {
+  /* Основные цвета сайта по запросу */
+  --bg-color: #050505;
+  --text-color: #f9f9f9;
+
+  /* Неоновые цвета */
+  --neon-red: #ff1053;
+  --neon-purple: #b026ff;
+  --neon-green: #00ff73;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: 'Outfit', sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Вспомогательные классы для плоского, но выразительного дизайна */
+.glass-panel {
+  background: rgba(10, 10, 10, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Анимация искажения (wave distortion) для фона элементов */
+@keyframes scanline {
+  0% {
+    transform: translateY(-100%);
+  }
+
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes eqWave1 {
+
+  0%,
+  100% {
+    height: 10%;
+    background-color: var(--neon-red);
+  }
+
+  50% {
+    height: 100%;
+    background-color: var(--neon-purple);
+  }
+}
+
+@keyframes eqWave2 {
+
+  0%,
+  100% {
+    height: 30%;
+    background-color: var(--neon-purple);
+  }
+
+  50% {
+    height: 80%;
+    background-color: var(--neon-green);
+  }
+}
+
+@keyframes eqWave3 {
+
+  0%,
+  100% {
+    height: 100%;
+    background-color: var(--neon-green);
+  }
+
+  50% {
+    height: 20%;
+    background-color: var(--neon-red);
+  }
+}
