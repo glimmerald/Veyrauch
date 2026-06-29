@@ -9,6 +9,41 @@
   --neon-red: #ff1053;
   --neon-purple: #b026ff;
   --neon-green: #00ff73;
+
+  /* Layout and Spacing Variables */
+  --container-max-width: 1200px;
+  --container-padding-x: 20px;
+  
+  --section-padding-y: 100px;
+  --header-padding-y: 40px;
+  
+  --spacing-sm: 10px;
+  --spacing-md: 20px;
+  --spacing-lg: 40px;
+  --spacing-xl: 60px;
+
+  /* Typography Variables */
+  --text-h1: clamp(2.5rem, 5vw, 5.5rem);
+  --text-h2: clamp(2.2rem, 4vw, 3.5rem);
+  --text-subtitle: clamp(1rem, 2vw, 1.8rem);
+}
+
+/* Breakpoints (using variables inside media queries for responsiveness) */
+@media (max-width: 1024px) {
+  :root {
+    --section-padding-y: 80px;
+    --header-padding-y: 30px;
+    --spacing-xl: 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --section-padding-y: 60px;
+    --header-padding-y: 20px;
+    --spacing-lg: 30px;
+    --container-padding-x: 15px;
+  }
 }
 
 * {
@@ -31,6 +66,21 @@ body {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Global Container System */
+.container {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding-left: var(--container-padding-x);
+  padding-right: var(--container-padding-x);
+  width: 100%;
+}
+
+.section {
+  padding-top: var(--section-padding-y);
+  padding-bottom: var(--section-padding-y);
+  position: relative;
 }
 
 /* Анимация искажения (wave distortion) для фона элементов */

@@ -1,6 +1,6 @@
 <template>
   <footer class="app-footer">
-    <div class="footer-content">
+    <div class="container footer-content">
       <p class="copyright">© {{ currentYear }} Veyrauch Cover Dance. Все права защищены.</p>
       <p class="disclaimer">
         Сайт носит исключительно информационный характер и ни при каких условиях не является публичной офертой, 
@@ -19,7 +19,7 @@ const currentYear = computed(() => new Date().getFullYear())
 <style scoped>
 .app-footer {
   width: 100%;
-  padding: 3rem 1.5rem;
+  padding: var(--spacing-xl) 0;
   background-color: transparent;
   display: flex;
   justify-content: center;
@@ -31,7 +31,6 @@ const currentYear = computed(() => new Date().getFullYear())
 }
 
 .footer-content {
-  max-width: 1200px;
   text-align: center;
   display: flex;
   flex-direction: column;

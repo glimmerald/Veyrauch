@@ -30,7 +30,7 @@ onUnmounted(() => {
   top: 0;
   left: 0;
   width: 100%;
-  padding: 40px 50px;
+  padding: var(--header-padding-y) var(--container-padding-x);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -40,7 +40,7 @@ onUnmounted(() => {
 }
 
 .app-header.is-scrolled {
-  padding: 15px 50px;
+  padding: 15px var(--container-padding-x);
 }
 
 .logo {

@@ -95,12 +95,10 @@ onMounted(() => {
 
 <style scoped>
 .section--gallery {
-  position: relative;
   z-index: 2;
   width: 100%;
   display: flex;
   flex-direction: column;
-  padding: 80px 0;
   background-color: transparent;
 }
 
@@ -130,8 +128,8 @@ onMounted(() => {
   width: max-content;
   /* Мозаика заполняется по колонкам (слева направо) */
   grid-auto-flow: column dense;
-  padding-left: max(20px, calc((100vw - 1400px) / 2 + 20px));
-  padding-right: max(20px, calc((100vw - 1400px) / 2 + 20px));
+  padding-left: max(var(--container-padding-x), calc((100vw - var(--container-max-width)) / 2 + var(--container-padding-x)));
+  padding-right: max(var(--container-padding-x), calc((100vw - var(--container-max-width)) / 2 + var(--container-padding-x)));
 }
 
 .gallery-item {

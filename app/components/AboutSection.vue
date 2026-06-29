@@ -1,8 +1,8 @@
 <template>
   <section class="section about-section">
-    <div class="about-container">
+    <div class="container about-container">
       <div class="about-image-wrapper">
-        <img src="/images/about.jpg" alt="Обо мне" class="about-image" />
+        <img src="/images/about.jpg" alt="Лера - преподаватель K-pop танцев в Краснодаре" class="about-image" />
         <div class="image-glow"></div>
       </div>
       <div class="about-content">
@@ -26,18 +26,14 @@
 
 <style scoped>
 .about-section {
-  padding: 100px 20px;
-  position: relative;
   z-index: 2;
   overflow: hidden;
 }
 
 .about-container {
-  max-width: 1200px;
-  margin: 0 auto;
   display: flex;
   align-items: center;
-  gap: 60px;
+  gap: var(--spacing-xl);
 }
 
 .about-image-wrapper {
@@ -79,7 +75,7 @@
 }
 
 .about-heading {
-  font-size: clamp(2.2rem, 4vw, 3.5rem);
+  font-size: var(--text-h2);
   font-weight: 800;
   text-transform: uppercase;
   color: #fff;
@@ -99,11 +95,11 @@
   gap: 20px;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .about-container {
     flex-direction: column;
     text-align: center;
-    gap: 40px;
+    gap: var(--spacing-lg);
   }
 
   .about-image-wrapper {
