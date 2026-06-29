@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Comfortaa:wght@400;600;700&display=swap');
 
 :root {
   /* Основные цвета сайта по запросу */
@@ -83,5 +83,44 @@ body {
   50% {
     height: 20%;
     background-color: var(--neon-red);
+  }
+}
+
+/* Неоновое мерцающее свечение для заголовков секций */
+.section-title,
+.about-heading {
+  font-family: 'Comfortaa', sans-serif;
+  font-weight: 700;
+  color: #ffffff;
+  animation: neon-glow-flicker 3.5s infinite;
+}
+
+@keyframes neon-glow-flicker {
+
+  0%,
+  18%,
+  22%,
+  25%,
+  53%,
+  57%,
+  100% {
+    text-shadow:
+      0 0 2px #ffffff,
+      0 0 6px #ffffff,
+      0 0 15px rgba(176, 38, 255, 0.9),
+      0 0 25px rgba(176, 38, 255, 0.8),
+      0 0 40px rgba(176, 38, 255, 0.6),
+      0 0 60px rgba(176, 38, 255, 0.4);
+  }
+
+  19%,
+  20%,
+  23%,
+  24%,
+  54%,
+  56% {
+    text-shadow:
+      0 0 1px #ffffff,
+      0 0 4px rgba(176, 38, 255, 0.4);
   }
 }

@@ -30,6 +30,7 @@ export function useStringWave(options: any = {}) {
         let p1 = c * Math.PI / 3;
         let p2 = c * Math.PI / 2;
 
+        const displacedPoints = [];
         for (let i = 0; i < pts.length; i++) {
           let p = pts[i];
           // Если конверт передан, используем его, иначе синусоида от l
@@ -40,11 +41,23 @@ export function useStringWave(options: any = {}) {
 
           let disp = envelope * (wave1 + wave2) * maxAmp * amplitude.value;
 
-          let x = p.x + p.nx * disp;
-          let y = p.y + p.ny * disp;
+          displacedPoints.push({
+            x: p.x + p.nx * disp,
+            y: p.y + p.ny * disp
+          });
+        }
 
-          if (i === 0) d += `M ${x} ${y} `;
-          else d += `L ${x} ${y} `;
+        if (displacedPoints.length > 0) {
+          d += `M ${displacedPoints[0].x} ${displacedPoints[0].y} `;
+          for (let i = 1; i < displacedPoints.length - 1; i++) {
+            let xc = (displacedPoints[i].x + displacedPoints[i + 1].x) / 2;
+            let yc = (displacedPoints[i].y + displacedPoints[i + 1].y) / 2;
+            d += `Q ${displacedPoints[i].x} ${displacedPoints[i].y} ${xc} ${yc} `;
+          }
+          if (displacedPoints.length > 1) {
+            let last = displacedPoints[displacedPoints.length - 1];
+            d += `L ${last.x} ${last.y} `;
+          }
         }
         if (closed) d += ' Z';
         newPaths.push(d);

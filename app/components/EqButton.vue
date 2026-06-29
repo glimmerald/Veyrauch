@@ -11,7 +11,7 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: var(--text-color);
   padding: 15px 40px;
-  font-family: 'Outfit', sans-serif;
+  font-family: inherit;
   font-size: 1.1rem;
   font-weight: 600;
   letter-spacing: 2px;

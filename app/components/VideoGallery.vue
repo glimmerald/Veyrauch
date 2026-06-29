@@ -64,9 +64,7 @@ onMounted(() => {
 
 <template>
   <section class="section section--gallery">
-    <div class="gallery-header">
-      <h2 class="gallery-title">Галерея</h2>
-    </div>
+    <SectionHeading>Галерея</SectionHeading>
     
     <!-- ClientOnly предотвращает ошибки гидратации (SSR), так как мы используем Math.random() -->
     <ClientOnly>
@@ -106,22 +104,7 @@ onMounted(() => {
   background-color: transparent;
 }
 
-.gallery-header {
-  max-width: 1400px;
-  margin: 0 auto;
-  width: 100%;
-  padding: 0 20px;
-}
 
-.gallery-title {
-  font-size: 4rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  color: var(--text-color, #fff);
-  margin-bottom: 40px;
-  text-align: center;
-  letter-spacing: 2px;
-}
 
 .gallery-scroll-wrapper {
   width: 100%;
@@ -147,7 +130,8 @@ onMounted(() => {
   width: max-content;
   /* Мозаика заполняется по колонкам (слева направо) */
   grid-auto-flow: column dense;
-  padding: 0 40px;
+  padding-left: max(20px, calc((100vw - 1400px) / 2 + 20px));
+  padding-right: max(20px, calc((100vw - 1400px) / 2 + 20px));
 }
 
 .gallery-item {
@@ -222,7 +206,6 @@ onMounted(() => {
   .gallery-grid {
     grid-template-rows: repeat(2, 200px);
     grid-auto-columns: 124px;
-    padding: 0 20px;
   }
 }
 
@@ -230,7 +213,6 @@ onMounted(() => {
   .gallery-grid {
     grid-template-rows: repeat(2, 180px);
     grid-auto-columns: 112px;
-    padding: 0 16px;
   }
 }
 </style>

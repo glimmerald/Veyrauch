@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Tektur:wght@400;500;600;700;800&family=Unbounded:wght@400;500;700;900&display=swap');
 
 :root {
   /* Основные цвета сайта по запросу */
@@ -20,7 +20,7 @@
 body {
   background-color: var(--bg-color);
   color: var(--text-color);
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Manrope', sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
@@ -52,4 +52,27 @@ body {
 @keyframes eqWave3 {
   0%, 100% { height: 100%; background-color: var(--neon-green); }
   50% { height: 20%; background-color: var(--neon-red); }
+}
+
+@keyframes neon-flicker-red {
+  0%, 100%, 12%, 16%, 73%, 77% {
+    text-shadow: 
+      0 0 4px rgba(255, 16, 83, 0.5),
+      0 0 10px rgba(255, 16, 83, 0.5),
+      0 0 20px rgba(255, 16, 83, 0.3);
+  }
+  14% {
+    text-shadow: 
+      0 0 2px rgba(255, 16, 83, 0.1),
+      0 0 5px rgba(255, 16, 83, 0.1);
+  }
+  75% {
+    text-shadow: 
+      0 0 3px rgba(255, 16, 83, 0.2),
+      0 0 8px rgba(255, 16, 83, 0.2);
+  }
+}
+
+.neon-heading-glow {
+  animation: neon-flicker-red 5s infinite;
 }
