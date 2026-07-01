@@ -5,6 +5,12 @@
 <script setup>
 import { useRuntimeConfig, useHead } from '#imports'
 
+useHead({
+  link: [
+    { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }
+  ]
+})
+
 const config = useRuntimeConfig()
 const headScripts = []
 

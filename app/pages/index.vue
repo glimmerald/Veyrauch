@@ -67,11 +67,18 @@ const faqs = [
   }
 ];
 
-// Управление прелоадером с учетом куки (работает и на сервере, избавляет от моргания)
+// Управление прелоадером с учетом куки
 const preloaderCookie = useCookie('preloaderShown', { maxAge: 5 * 60 * 60 });
 
-// Если кука есть, значит мы показывали прелоадер менее 5 часов назад
-const preloaderFinished = ref(!!preloaderCookie.value);
+// Инициализируем всегда как false, чтобы серверный HTML полностью совпадал с клиентским (убирает Hydration Mismatch)
+const preloaderFinished = ref(false);
+
+onMounted(() => {
+  // Проверяем куку только после гидратации на стороне клиента
+  if (preloaderCookie.value) {
+    preloaderFinished.value = true;
+  }
+});
 
 function onPreloaderComplete() {
   preloaderFinished.value = true;
@@ -138,7 +145,8 @@ useHead({
 .hero-wrapper {
   position: relative;
   width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
+  min-height: 100svh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -190,20 +198,35 @@ useHead({
 
 .subtitle {
   font-family: 'Tektur', sans-serif;
-  font-size: 1.2rem;
+  font-size: clamp(0.9rem, 2.5vw, 1.2rem);
   font-weight: 600;
-  letter-spacing: 4px;
+  letter-spacing: 2px;
   text-transform: uppercase;
   color: rgba(255,255,255,0.7);
   max-width: 600px;
+  padding: 0 var(--container-padding-x);
 }
 
 .buttons-row {
   display: flex;
   gap: 20px;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   margin-top: 40px;
+  padding: 0 var(--container-padding-x);
+}
+
+@media (max-width: 768px) {
+  .content {
+    gap: 20px;
+  }
+  
+  .buttons-row {
+    margin-top: 25px;
+    flex-direction: column;
+    gap: 15px;
+  }
 }
 
 .faq-section {

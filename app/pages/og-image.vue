@@ -30,12 +30,14 @@ useHead({
 
 .og-text {
   font-family: 'Unbounded', sans-serif;
-  font-size: 15rem; /* Очень крупно для OG Image (обычно 1200x630) */
+  font-size: clamp(4rem, 10vw, 12rem); /* Адаптивный размер, чтобы буквы не обрезались */
   font-weight: 900;
   letter-spacing: 10px;
   color: #fff; /* Или можно сделать неоновым */
   text-transform: uppercase;
   z-index: 10;
+  text-align: center;
+  max-width: 90vw; /* Дополнительная защита от обрезания */
   text-shadow: 0 0 50px rgba(255, 16, 83, 0.5); /* Неоновое свечение */
 }
 

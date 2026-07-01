@@ -54,4 +54,14 @@ const currentYear = computed(() => new Date().getFullYear())
   max-width: 800px;
   line-height: 1.5;
 }
+
+@media (max-width: 480px) {
+  .copyright {
+    font-size: 0.8rem;
+  }
+  .disclaimer {
+    font-size: 0.65rem;
+    line-height: 1.4;
+  }
+}
 </style>

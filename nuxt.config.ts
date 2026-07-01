@@ -11,7 +11,8 @@ export default defineNuxtConfig({
 
   site: {
     url: 'https://veyrauch-dance.ru', // Временно или можно заменить на реальный домен
-    name: 'Veyrauch Cover Dance'
+    name: 'Veyrauch Cover Dance',
+    indexable: false // Запрет индексации для тестового домена
   },
 
   runtimeConfig: {

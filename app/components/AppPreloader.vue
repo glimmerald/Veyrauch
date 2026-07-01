@@ -37,6 +37,7 @@ const { paths, basePoints, amplitude, colors } = useStringWave({ closed: true, m
 
 const frame = { top: 0, bottom: 0, left: 0, right: 0 };
 let tickerFunc = null;
+let tl = null; // Храним ссылку на timeline
 
 function updatePoints() {
   const w = frame.right - frame.left;
@@ -66,7 +67,7 @@ onMounted(() => {
   tickerFunc = () => updatePoints();
   gsap.ticker.add(tickerFunc);
   
-  const tl = gsap.timeline({
+  tl = gsap.timeline({
     onComplete: () => {
       emit('complete');
     }
@@ -131,6 +132,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   if (tickerFunc) gsap.ticker.remove(tickerFunc);
+  if (tl) tl.kill();
 });
 </script>
 
@@ -165,10 +167,10 @@ path {
   position: relative;
   z-index: 2;
   display: flex;
-  gap: 15px;
-  font-size: 6rem;
+  gap: clamp(5px, 1.5vw, 15px);
+  font-size: clamp(2rem, 10vw, 6rem);
   font-weight: 800;
-  letter-spacing: 5px;
+  letter-spacing: clamp(2px, 1vw, 5px);
   color: var(--text-color);
   transform-origin: center center;
 }

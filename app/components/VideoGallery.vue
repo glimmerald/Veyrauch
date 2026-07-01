@@ -213,4 +213,11 @@ onMounted(() => {
     grid-auto-columns: 112px;
   }
 }
+
+@media (max-width: 380px) {
+  .gallery-grid {
+    grid-template-rows: repeat(2, 160px);
+    grid-auto-columns: 100px;
+  }
+}
 </style>

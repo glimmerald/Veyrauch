@@ -207,4 +207,27 @@ path {
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+
+@media (max-width: 768px) {
+  .faq-content {
+    padding: 15px 20px;
+  }
+  .faq-question {
+    font-size: 1rem;
+    padding-right: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .faq-content {
+    padding: 12px 15px;
+  }
+  .faq-question {
+    font-size: 0.9rem;
+  }
+  .faq-answer {
+    font-size: 0.9rem;
+    padding-top: 10px;
+  }
+}
 </style>

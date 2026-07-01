@@ -64,4 +64,31 @@ onUnmounted(() => {
   font-size: 0.9rem;
   padding: 12px 30px;
 }
+
+@media (max-width: 768px) {
+  .logo {
+    font-size: 1.4rem;
+  }
+  .app-header.is-scrolled .logo {
+    font-size: 1.2rem;
+  }
+  .book-btn {
+    font-size: 0.8rem;
+    padding: 10px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo {
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+  }
+  .app-header.is-scrolled .logo {
+    font-size: 1rem;
+  }
+  .book-btn {
+    font-size: 0.75rem;
+    padding: 8px 16px;
+  }
+}
 </style>

@@ -15,12 +15,21 @@
 }
 
 .section-title {
-  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-size: var(--text-h2);
   font-weight: 800;
   text-transform: uppercase;
   color: var(--text-color, #fff);
   margin-bottom: 40px;
   text-align: left;
   letter-spacing: 2px;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+@media (max-width: 480px) {
+  .section-title {
+    letter-spacing: 0;
+    margin-bottom: 25px;
+  }
 }
 </style>

@@ -23,9 +23,9 @@
   --spacing-xl: 60px;
 
   /* Typography Variables */
-  --text-h1: clamp(2.5rem, 5vw, 5.5rem);
-  --text-h2: clamp(2.2rem, 4vw, 3.5rem);
-  --text-subtitle: clamp(1rem, 2vw, 1.8rem);
+  --text-h1: clamp(2rem, 6vw, 5.5rem);
+  --text-h2: clamp(1.8rem, 5vw, 3.5rem);
+  --text-subtitle: clamp(1rem, 2.5vw, 1.8rem);
 }
 
 /* Breakpoints (using variables inside media queries for responsiveness) */
@@ -42,6 +42,15 @@
     --section-padding-y: 60px;
     --header-padding-y: 20px;
     --spacing-lg: 30px;
+    --container-padding-x: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --section-padding-y: 50px;
+    --header-padding-y: 15px;
+    --spacing-lg: 20px;
     --container-padding-x: 15px;
   }
 }
