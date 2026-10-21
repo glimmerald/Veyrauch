@@ -16,9 +16,9 @@
           <span class="title-sub">от первых шагов до уверенного cover-выступления</span>
         </h1>
         <h2 class="subtitle">Набор в группу для начинающих</h2>
-        
+
         <div class="buttons-row">
-          <StringWaveButton>Запишись на пробное занятие</StringWaveButton>
+          <StringWaveButton :href="'https://t.me/jsmjm?text=' + encodeURIComponent('Здравствуйте! Хочу записаться на пробное занятие.')" target="_blank">Запишись на пробное занятие</StringWaveButton>
         </div>
       </main>
     </div>
@@ -30,17 +30,12 @@
     <section class="section faq-section">
       <SectionHeading>Сомневаешься, стоит ли начинать?</SectionHeading>
       <div class="faq-list">
-        <FaqAccordion 
-          v-for="(faq, index) in faqs" 
-          :key="index"
-          :question="faq.question"
-          :answer="faq.answer"
-        />
+        <FaqAccordion v-for="(faq, index) in faqs" :key="index" :question="faq.question" :answer="faq.answer" />
       </div>
     </section>
 
     <AppFooter />
-    
+
     <CookieBanner />
   </div>
 </template>
@@ -63,19 +58,25 @@ const faqs = [
   },
   {
     question: 'В чем приходить на тренировки? Нужно ли покупать какую-то специальную форму?',
-    answer: 'Главное правило — тебе должно быть комфортно двигаться! Идеально подойдут широкие штаны или джоггеры, свободная оверсайз-футболка или кроп-топ, а на ноги — удобные чистые кроссовки. Выбирай то, в чем чувствуешь себя свободно и уверенно. Мы приходим танцевать и кайфовать от процесса, а фирменный K-pop стиль обязательно придет со временем!'
+    answer: 'Главное правило — тебе должно быть комфортно двигаться! Идеально подойдут широкие штаны или джоггеры, свободная оверсайз-футболка или кроп-топ, а на ноги — удобные чистые кроссовки. Выбирай то, в чем чувствуешь себя свободно и уверенно. Мы приходим танцевать и кайфовать от процесса.'
   }
 ];
 
-// Управление прелоадером с учетом куки
+// Конфигурация и проверка поисковых ботов
+const config = useRuntimeConfig();
+const headers = useRequestHeaders(['user-agent']);
+const userAgent = headers['user-agent'] || '';
+const isBot = /bot|google|crawler|spider|robot|crawling/i.test(userAgent);
+
+// Управление прелоадером с учетом куки и краулеров
 const preloaderCookie = useCookie('preloaderShown', { maxAge: 5 * 60 * 60 });
 
-// Инициализируем всегда как false, чтобы серверный HTML полностью совпадал с клиентским (убирает Hydration Mismatch)
-const preloaderFinished = ref(false);
+// Для поисковых ботов сразу отдаем готовый контент (чтобы Googlebot и Яндекс не натыкались на 6с прелоадер с opacity: 0)
+const preloaderFinished = ref(isBot ? true : false);
 
 onMounted(() => {
   // Проверяем куку только после гидратации на стороне клиента
-  if (preloaderCookie.value) {
+  if (preloaderCookie.value || isBot) {
     preloaderFinished.value = true;
   }
 });
@@ -85,14 +86,40 @@ function onPreloaderComplete() {
   preloaderCookie.value = 'true';
 }
 
+const canonicalUrl = 'https://veyrauch.ru/';
+const siteName = 'Veyrauch Cover Dance';
+const ogImage = 'https://veyrauch.ru/og-image.jpg';
+
 useHead({
   title: 'K-pop танцы в Краснодаре | Студия Veyrauch — Записаться на танцы',
+  link: [
+    { rel: 'canonical', href: canonicalUrl }
+  ],
   meta: [
     { name: 'description', content: 'Школа K-pop танцев Veyrauch в центре Краснодара. Набор в группы для начинающих с нуля. Научим танцевать любимые cover-хореографии в комфортной атмосфере.' },
-    { property: 'og:title', content: 'K-pop танцы в Краснодаре | Студия Veyrauch' },
-    { property: 'og:description', content: 'Набор в группу для начинающих. Разбираем движения медленно и пошагово!' },
-    { property: 'og:image', content: '/og-image.jpg' }, // Эту картинку мы позже сделаем
-    { property: 'og:type', content: 'website' }
+    { name: 'keywords', content: 'k-pop танцы краснодар, кавердэнс краснодар, школа k-pop танцев краснодар, k-pop cover dance краснодар, танцы для начинающих краснодар, студия танцев veyrauch' },
+    { name: 'robots', content: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' },
+    
+    // Open Graph
+    { property: 'og:site_name', content: siteName },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:url', content: canonicalUrl },
+    { property: 'og:title', content: 'K-pop танцы в Краснодаре | Студия Veyrauch — Записаться на танцы' },
+    { property: 'og:description', content: 'Школа K-pop танцев Veyrauch в центре Краснодара. Набор в группу для начинающих с нуля. Разбираем движения медленно и пошагово!' },
+    { property: 'og:image', content: ogImage },
+    { property: 'og:image:width', content: '1200' },
+    { property: 'og:image:height', content: '630' },
+    { property: 'og:image:alt', content: 'Студия K-pop танцев Veyrauch в Краснодаре' },
+    { property: 'og:locale', content: 'ru_RU' },
+
+    // Twitter Card
+    { name: 'twitter:card', content: 'summary_large_image' },
+    { name: 'twitter:title', content: 'K-pop танцы в Краснодаре | Студия Veyrauch' },
+    { name: 'twitter:description', content: 'Набор в группу для начинающих с нуля в центре Краснодара.' },
+    { name: 'twitter:image', content: ogImage },
+
+    // Google Search Console подтверждение (если передано через env или конфиг)
+    ...(config.public.googleSiteVerification ? [{ name: 'google-site-verification', content: config.public.googleSiteVerification }] : [])
   ],
   script: [
     {
@@ -100,14 +127,28 @@ useHead({
       children: JSON.stringify({
         '@context': 'https://schema.org',
         '@type': 'DanceSchool',
+        '@id': 'https://veyrauch.ru/#school',
         name: 'Veyrauch Cover Dance',
-        description: 'Школа K-pop танцев для начинающих в Краснодаре.',
+        alternateName: 'Студия K-pop танцев Veyrauch в Краснодаре',
+        description: 'Школа K-pop танцев для начинающих в Краснодаре. Обучение cover dance с нуля, разбор хореографий, комфортная атмосфера.',
+        url: 'https://veyrauch.ru/',
+        telephone: '+7-905-858-30-82',
+        image: ogImage,
+        priceRange: '₽₽',
         address: {
           '@type': 'PostalAddress',
           addressLocality: 'Краснодар',
           addressRegion: 'Краснодарский край',
           addressCountry: 'RU'
-        }
+        },
+        geo: {
+          '@type': 'GeoCoordinates',
+          latitude: 45.035470,
+          longitude: 38.975313
+        },
+        sameAs: [
+          'https://t.me/jsmjm'
+        ]
       })
     },
     {
@@ -130,16 +171,16 @@ useHead({
 </script>
 
 <style scoped>
-/* Начальное состояние контента: скрыт и размыт */
+/* Начальное состояние контента: скрыт */
 .hero-wrapper {
   opacity: 0;
-  filter: blur(20px);
-  transition: opacity 1.5s ease-out, filter 1.5s ease-out;
+  transform: translateY(20px);
+  transition: opacity 1.5s ease-out, transform 1.5s ease-out;
 }
 
 .fade-in-header {
   opacity: 0;
-  filter: blur(20px);
+  transform: translateY(-10px);
 }
 
 .hero-wrapper {
@@ -153,10 +194,11 @@ useHead({
   overflow: hidden;
 }
 
-/* Проявление из жидкости */
-.hero-wrapper.hero-visible, .fade-in-header.hero-visible {
+/* Проявление */
+.hero-wrapper.hero-visible,
+.fade-in-header.hero-visible {
   opacity: 1;
-  filter: blur(0px);
+  transform: translateY(0);
 }
 
 
@@ -184,7 +226,7 @@ useHead({
   font-family: 'Manrope', sans-serif;
   font-size: var(--text-subtitle);
   font-weight: 500;
-  color: rgba(255,255,255,0.9);
+  color: rgba(255, 255, 255, 0.9);
   letter-spacing: 0;
   display: block;
   margin-top: 10px;
@@ -202,7 +244,7 @@ useHead({
   font-weight: 600;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.7);
+  color: rgba(255, 255, 255, 0.7);
   max-width: 600px;
   padding: 0 var(--container-padding-x);
 }
@@ -221,7 +263,7 @@ useHead({
   .content {
     gap: 20px;
   }
-  
+
   .buttons-row {
     margin-top: 25px;
     flex-direction: column;
@@ -230,7 +272,8 @@ useHead({
 }
 
 .faq-section {
-  z-index: 2; /* To ensure it stays above background dots */
+  z-index: 2;
+  /* To ensure it stays above background dots */
 }
 
 .faq-list {

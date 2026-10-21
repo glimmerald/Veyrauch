@@ -80,9 +80,8 @@
   transform: translate(-50%, -50%);
   width: 110%;
   height: 110%;
-  background: radial-gradient(circle, rgba(255, 16, 83, 0.25) 0%, rgba(0, 0, 0, 0) 60%);
+  background: radial-gradient(circle, rgba(255, 16, 83, 0.4) 0%, rgba(255, 16, 83, 0.1) 40%, rgba(0, 0, 0, 0) 70%);
   z-index: 1;
-  filter: blur(40px);
 }
 
 .about-content {

@@ -19,7 +19,9 @@ export function useDotGrid(canvasRef: any) {
   }
 
   let activeDots: FlickeringDot[] = [];
-  const maxActiveDots = 60; // Max dots flickering simultaneously
+  const maxActiveDotsDesktop = 60;
+  const maxActiveDotsMobile = 20;
+  let maxActiveDots = maxActiveDotsDesktop;
 
   let mouseX = -1000;
   let mouseY = -1000;
@@ -43,6 +45,8 @@ export function useDotGrid(canvasRef: any) {
     if (ctx) {
       ctx.scale(dpr, dpr);
     }
+
+    maxActiveDots = width < 768 ? maxActiveDotsMobile : maxActiveDotsDesktop;
 
     cols = Math.ceil(width / gridStep);
     rows = Math.ceil(height / gridStep);
@@ -110,20 +114,7 @@ export function useDotGrid(canvasRef: any) {
     // Clear the canvas
     ctx.clearRect(0, 0, width, height);
 
-    // 1. Draw the static grid
-    // Using a single path for all dots is highly optimized for Canvas
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-    ctx.beginPath();
-    for (let i = 0; i <= cols; i++) {
-      for (let j = 0; j <= rows; j++) {
-        // The old CSS radial-gradient was starting at 0,0. 
-        // We can replicate that exact alignment:
-        const x = i * gridStep;
-        const y = j * gridStep;
-        ctx.rect(x - 0.5, y - 0.5, 1, 1);
-      }
-    }
-    ctx.fill();
+    // 1. Static grid is now handled by CSS in BackgroundDots.vue
 
     // 2. Spawn new flickering dots
     spawnDot(timeScale);
@@ -139,26 +130,24 @@ export function useDotGrid(canvasRef: any) {
         continue;
       }
 
-      const x = dot.c * gridStep;
-      const y = dot.r * gridStep;
+      const x = dot.c * gridStep + gridStep / 2;
+      const y = dot.r * gridStep + gridStep / 2;
 
       const currentAlpha = Math.sin(dot.phase) * dot.maxAlpha;
       const radius = 1 + Math.sin(dot.phase) * 1.5; // Slight size pulsing
 
-      ctx.fillStyle = dot.color;
       ctx.globalAlpha = currentAlpha;
 
+      // Create a fast radial gradient instead of using shadowBlur
+      const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius * 3);
+      gradient.addColorStop(0, dot.color);
+      gradient.addColorStop(0.3, dot.color);
+      gradient.addColorStop(1, 'rgba(0,0,0,0)');
+
+      ctx.fillStyle = gradient;
       ctx.beginPath();
-      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.arc(x, y, radius * 3, 0, Math.PI * 2);
       ctx.fill();
-
-      // Add a small glow effect
-      ctx.shadowBlur = 10;
-      ctx.shadowColor = dot.color;
-      ctx.fill();
-
-      // Reset shadow for the next draws
-      ctx.shadowBlur = 0;
     }
 
     // Reset global alpha for the next frame

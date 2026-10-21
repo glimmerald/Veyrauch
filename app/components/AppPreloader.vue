@@ -73,8 +73,15 @@ onMounted(() => {
     }
   });
   
+  const isMobile = winW < 768;
+  
   // Исходное состояние букв
-  gsap.set('.glitch-letter', { scaleY: 15, opacity: 0, filter: 'blur(10px)', color: 'var(--neon-green)' });
+  gsap.set('.glitch-letter', { 
+    scaleY: 15, 
+    opacity: 0, 
+    filter: isMobile ? 'none' : 'blur(10px)', 
+    color: 'var(--neon-green)' 
+  });
   
   // 1. Струна вибрирует
   tl.to(amplitude, { value: 0.2, duration: 1, ease: 'power2.inOut' });
@@ -84,7 +91,7 @@ onMounted(() => {
   tl.to('.glitch-letter', {
     scaleY: 1,
     opacity: 1,
-    filter: 'blur(0px)',
+    filter: isMobile ? 'none' : 'blur(0px)',
     color: 'var(--text-color)',
     duration: 0.6,
     stagger: 0.05,
@@ -116,7 +123,7 @@ onMounted(() => {
   tl.to('.text-container', {
     scale: 20,
     opacity: 0,
-    filter: 'blur(20px)',
+    filter: isMobile ? 'none' : 'blur(20px)',
     duration: 1.5,
     ease: 'power4.in'
   }, "+=0.2");
@@ -161,6 +168,12 @@ path {
   filter: drop-shadow(0 0 8px currentColor);
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+@media (max-width: 768px) {
+  path {
+    filter: none;
+  }
 }
 
 .text-container {

@@ -6,6 +6,9 @@
 import { useRuntimeConfig, useHead } from '#imports'
 
 useHead({
+  htmlAttrs: {
+    lang: 'ru'
+  },
   link: [
     { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }
   ]
@@ -14,29 +17,6 @@ useHead({
 const config = useRuntimeConfig()
 const headScripts = []
 
-if (config.public.yandexMetrikaId) {
-  headScripts.push({
-    innerHTML: `
-      (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-      m[i].l=1*new Date();
-      for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
-      k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
-      (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
-
-      ym(${config.public.yandexMetrikaId}, "init", {
-           ssr:true,
-           webvisor:true,
-           clickmap:true,
-           ecommerce:"dataLayer",
-           referrer: document.referrer,
-           url: location.href,
-           accurateTrackBounce:true,
-           trackLinks:true
-      });
-    `,
-    type: 'text/javascript'
-  })
-}
 
 if (config.public.googleAnalyticsId) {
   headScripts.push({

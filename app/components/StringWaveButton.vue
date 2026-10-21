@@ -1,5 +1,8 @@
 <template>
-  <button 
+  <component 
+    :is="href ? 'a' : 'button'"
+    :href="href"
+    :target="target"
     class="string-wave-btn" 
     ref="btn"
     @mouseenter="onEnter" 
@@ -17,11 +20,16 @@
       />
     </svg>
     <span class="btn-text"><slot /></span>
-  </button>
+  </component>
 </template>
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue';
+
+const props = defineProps({
+  href: { type: String, default: null },
+  target: { type: String, default: null }
+});
 import { useStringWave } from '../composables/useStringWave';
 
 const btn = ref(null);
@@ -97,20 +105,46 @@ onBeforeUnmount(() => {
   border: none;
   color: var(--text-color);
   padding: 15px 40px;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
   font-family: inherit;
   font-size: 1.1rem;
   font-weight: 600;
   letter-spacing: 2px;
   text-transform: uppercase;
   cursor: pointer;
-  transition: background 0.3s ease, box-shadow 0.3s ease;
+  transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.1s ease;
   overflow: visible; 
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2); 
+}
+
+.string-wave-btn::before {
+  content: '';
+  position: absolute;
+  top: -2px; left: -2px; right: -2px; bottom: -2px;
+  background: linear-gradient(90deg, var(--neon-red), var(--neon-purple), var(--neon-green), var(--neon-red));
+  background-size: 300% 100%;
+  z-index: 0;
+  opacity: 0;
+  filter: blur(8px);
+  transition: opacity 0.3s ease;
+  animation: bg-shift 3s linear infinite;
+  pointer-events: none;
 }
 
 .string-wave-btn:hover {
   background: rgba(20, 20, 20, 0.8);
   box-shadow: inset 0 0 0 1px transparent; 
+}
+
+.string-wave-btn:active {
+  transform: scale(0.96);
+}
+
+.string-wave-btn:active::before {
+  opacity: 1;
+  transition: opacity 0.05s ease;
 }
 
 .btn-text {
@@ -132,5 +166,10 @@ path {
   filter: drop-shadow(0 0 4px currentColor);
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+@keyframes bg-shift {
+  0% { background-position: 0% 0; }
+  100% { background-position: 150% 0; }
 }
 </style>

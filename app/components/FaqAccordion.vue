@@ -67,7 +67,7 @@ const onLeave = () => {
 
 const toggle = () => {
   isOpen.value = !isOpen.value;
-  velocity += 2.0; 
+  velocity += 0.5; 
 };
 
 function initPoints() {
