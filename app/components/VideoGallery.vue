@@ -97,21 +97,24 @@ onMounted(() => {
 .section--gallery {
   z-index: 2;
   width: 100%;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   background-color: transparent;
+  overflow: hidden;
 }
-
-
 
 .gallery-scroll-wrapper {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   overflow-x: auto;
   overflow-y: hidden;
   padding-bottom: 30px;
   padding-top: 10px;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
 }
 
 .gallery-scroll-wrapper::-webkit-scrollbar {

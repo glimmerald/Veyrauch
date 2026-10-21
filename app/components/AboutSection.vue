@@ -120,7 +120,7 @@
 
   .about-image-wrapper {
     max-width: 100%;
-    padding: 0 10px;
+    padding: 0;
   }
 
   .about-heading {
@@ -133,14 +133,24 @@
 }
 
 @media (max-width: 480px) {
+  .image-glow {
+    width: 100%;
+    height: 100%;
+  }
+
+  .about-image {
+    border-radius: 16px;
+  }
+
   .about-text {
-    font-size: 1rem;
+    font-size: 0.95rem;
     line-height: 1.6;
-    gap: 15px;
+    gap: 14px;
   }
 
   .about-heading {
-    letter-spacing: 0;
+    letter-spacing: 0.5px;
+    margin-bottom: 20px;
   }
 }
 </style>

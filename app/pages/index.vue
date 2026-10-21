@@ -12,13 +12,14 @@
     <div class="hero-wrapper" :class="{ 'hero-visible': preloaderFinished }">
       <main class="content">
         <h1 class="title">
-          <span class="neon-text">K-pop</span> танцы в Краснодаре:<br>
+          <span class="title-line"><NeonKpop /> танцы в</span>
+          <span class="title-line">Краснодаре:</span>
           <span class="title-sub">от первых шагов до уверенного cover-выступления</span>
         </h1>
         <h2 class="subtitle">Набор в группу для начинающих</h2>
 
         <div class="buttons-row">
-          <StringWaveButton :href="'https://t.me/jsmjm?text=' + encodeURIComponent('Здравствуйте! Хочу записаться на пробное занятие.')" target="_blank">Запишись на пробное занятие</StringWaveButton>
+          <StringWaveButton class="hero-cta-btn" :href="'https://t.me/jsmjm?text=' + encodeURIComponent('Здравствуйте! Хочу записаться на пробное занятие.')" target="_blank">Запишись на пробное занятие</StringWaveButton>
         </div>
       </main>
     </div>
@@ -64,8 +65,9 @@ const faqs = [
 
 // Конфигурация и проверка поисковых ботов
 const config = useRuntimeConfig();
-const headers = useRequestHeaders(['user-agent']);
-const userAgent = headers['user-agent'] || '';
+const userAgent = import.meta.server 
+  ? (useRequestHeaders(['user-agent'])['user-agent'] || '')
+  : (typeof navigator !== 'undefined' ? navigator.userAgent : '');
 const isBot = /bot|google|crawler|spider|robot|crawling/i.test(userAgent);
 
 // Управление прелоадером с учетом куки и краулеров
@@ -185,13 +187,16 @@ useHead({
 
 .hero-wrapper {
   position: relative;
-  width: 100vw;
+  width: 100%;
+  max-width: 100%;
   min-height: 100vh;
   min-height: 100svh;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  box-sizing: border-box;
+  padding: 100px var(--container-padding-x) 50px;
 }
 
 /* Проявление */
@@ -201,25 +206,37 @@ useHead({
   transform: translateY(0);
 }
 
-
 .content {
   text-align: center;
   z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 30px;
+  gap: 28px;
+  width: 100%;
+  max-width: 1050px;
+  margin: 0 auto;
 }
 
 .title {
   font-family: 'Unbounded', sans-serif;
   font-size: var(--text-h1);
   font-weight: 900;
-  line-height: 1.2;
+  line-height: 1.25;
   letter-spacing: -2px;
   color: var(--text-color);
   text-transform: uppercase;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.title-line {
+  display: inline;
+}
+
+.title-line:first-child {
+  margin-right: 0.28em;
 }
 
 .title-sub {
@@ -229,18 +246,14 @@ useHead({
   color: rgba(255, 255, 255, 0.9);
   letter-spacing: 0;
   display: block;
-  margin-top: 10px;
-}
-
-.neon-text {
-  color: transparent;
-  -webkit-text-stroke: 2px var(--neon-red);
-  text-shadow: 0 0 25px rgba(255, 16, 83, 0.6);
+  margin-top: 14px;
+  line-height: 1.45;
+  text-transform: none;
 }
 
 .subtitle {
   font-family: 'Tektur', sans-serif;
-  font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+  font-size: clamp(0.85rem, 2.5vw, 1.2rem);
   font-weight: 600;
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -255,19 +268,77 @@ useHead({
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  margin-top: 40px;
+  margin-top: 25px;
   padding: 0 var(--container-padding-x);
+  width: 100%;
 }
 
 @media (max-width: 768px) {
+  .hero-wrapper {
+    padding-top: 85px;
+    padding-bottom: 40px;
+  }
+
   .content {
     gap: 20px;
   }
 
+  .title {
+    letter-spacing: -1px;
+    line-height: 1.25;
+    margin-bottom: 10px;
+  }
+
+  .title-line {
+    display: block;
+  }
+
+  .title-line:first-child {
+    margin-right: 0;
+    margin-bottom: 4px;
+  }
+
+  .title-sub {
+    margin-top: 10px;
+  }
+
   .buttons-row {
-    margin-top: 25px;
+    margin-top: 15px;
     flex-direction: column;
     gap: 15px;
+  }
+
+  .hero-cta-btn {
+    width: 100%;
+    max-width: 360px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-wrapper {
+    padding-top: 75px;
+    padding-bottom: 30px;
+  }
+
+  .content {
+    gap: 16px;
+  }
+
+  .title {
+    letter-spacing: -0.5px;
+    line-height: 1.26;
+  }
+
+  .subtitle {
+    letter-spacing: 1px;
+  }
+
+  .buttons-row {
+    margin-top: 10px;
+  }
+
+  .hero-cta-btn {
+    max-width: 330px;
   }
 }
 

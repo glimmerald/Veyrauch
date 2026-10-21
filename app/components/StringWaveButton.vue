@@ -106,10 +106,12 @@ onBeforeUnmount(() => {
   color: var(--text-color);
   padding: 15px 40px;
   text-decoration: none;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   font-family: inherit;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 600;
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -117,6 +119,25 @@ onBeforeUnmount(() => {
   transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.1s ease;
   overflow: visible; 
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2); 
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .string-wave-btn {
+    padding: 14px 26px;
+    font-size: 0.95rem;
+    letter-spacing: 1.5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .string-wave-btn {
+    padding: 12px 18px;
+    font-size: 0.84rem;
+    letter-spacing: 0.8px;
+    max-width: 100%;
+  }
 }
 
 .string-wave-btn::before {

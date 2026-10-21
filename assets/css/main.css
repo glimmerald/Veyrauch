@@ -1,12 +1,66 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Comfortaa:wght@400;600;700&display=swap');
+
 :root {
   /* Основные цвета сайта по запросу */
   --bg-color: #050505;
   --text-color: #f9f9f9;
-  
+
   /* Неоновые цвета */
   --neon-red: #ff1053;
   --neon-purple: #b026ff;
   --neon-green: #00ff73;
+
+  /* Layout and Spacing Variables */
+  --container-max-width: 1200px;
+  --container-padding-x: 20px;
+  
+  --section-padding-y: 100px;
+  --header-padding-y: 40px;
+  
+  --spacing-sm: 10px;
+  --spacing-md: 20px;
+  --spacing-lg: 40px;
+  --spacing-xl: 60px;
+
+  /* Typography Variables */
+  --text-h1: clamp(2rem, 5.5vw, 5.2rem);
+  --text-h2: clamp(1.8rem, 4.5vw, 3.5rem);
+  --text-subtitle: clamp(1rem, 2.2vw, 1.7rem);
+}
+
+/* Breakpoints (using variables inside media queries for responsiveness) */
+@media (max-width: 1024px) {
+  :root {
+    --section-padding-y: 80px;
+    --header-padding-y: 30px;
+    --spacing-xl: 40px;
+    --text-h1: clamp(1.85rem, 5.5vw, 4rem);
+    --text-h2: clamp(1.65rem, 4.5vw, 2.8rem);
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --section-padding-y: 60px;
+    --header-padding-y: 20px;
+    --spacing-lg: 30px;
+    --container-padding-x: 16px;
+    --text-h1: clamp(1.65rem, 6vw, 2.8rem);
+    --text-h2: clamp(1.5rem, 5vw, 2.3rem);
+    --text-subtitle: clamp(0.95rem, 3.2vw, 1.3rem);
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --section-padding-y: 50px;
+    --header-padding-y: 15px;
+    --spacing-lg: 20px;
+    --container-padding-x: 14px;
+    --text-h1: clamp(1.45rem, 6.8vw, 2.2rem);
+    --text-h2: clamp(1.35rem, 5.5vw, 1.85rem);
+    --text-subtitle: clamp(0.88rem, 3.6vw, 1.15rem);
+  }
 }
 
 * {
@@ -15,11 +69,20 @@
   box-sizing: border-box;
 }
 
+html {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
 body {
   background-color: var(--bg-color);
   color: var(--text-color);
-  font-family: 'Manrope', sans-serif;
+  font-family: 'Outfit', sans-serif;
   overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -31,46 +94,112 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+/* Global Container System */
+.container {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding-left: var(--container-padding-x);
+  padding-right: var(--container-padding-x);
+  width: 100%;
+}
+
+.section {
+  padding-top: var(--section-padding-y);
+  padding-bottom: var(--section-padding-y);
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
 /* Анимация искажения (wave distortion) для фона элементов */
 @keyframes scanline {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(100%); }
+  0% {
+    transform: translateY(-100%);
+  }
+
+  100% {
+    transform: translateY(100%);
+  }
 }
 
 @keyframes eqWave1 {
-  0%, 100% { height: 10%; background-color: var(--neon-red); }
-  50% { height: 100%; background-color: var(--neon-purple); }
+
+  0%,
+  100% {
+    height: 10%;
+    background-color: var(--neon-red);
+  }
+
+  50% {
+    height: 100%;
+    background-color: var(--neon-purple);
+  }
 }
 
 @keyframes eqWave2 {
-  0%, 100% { height: 30%; background-color: var(--neon-purple); }
-  50% { height: 80%; background-color: var(--neon-green); }
+
+  0%,
+  100% {
+    height: 30%;
+    background-color: var(--neon-purple);
+  }
+
+  50% {
+    height: 80%;
+    background-color: var(--neon-green);
+  }
 }
 
 @keyframes eqWave3 {
-  0%, 100% { height: 100%; background-color: var(--neon-green); }
-  50% { height: 20%; background-color: var(--neon-red); }
-}
 
-@keyframes neon-flicker-red {
-  0%, 100%, 12%, 16%, 73%, 77% {
-    text-shadow: 
-      0 0 4px rgba(255, 16, 83, 0.5),
-      0 0 10px rgba(255, 16, 83, 0.5),
-      0 0 20px rgba(255, 16, 83, 0.3);
+  0%,
+  100% {
+    height: 100%;
+    background-color: var(--neon-green);
   }
-  14% {
-    text-shadow: 
-      0 0 2px rgba(255, 16, 83, 0.1),
-      0 0 5px rgba(255, 16, 83, 0.1);
-  }
-  75% {
-    text-shadow: 
-      0 0 3px rgba(255, 16, 83, 0.2),
-      0 0 8px rgba(255, 16, 83, 0.2);
+
+  50% {
+    height: 20%;
+    background-color: var(--neon-red);
   }
 }
 
-.neon-heading-glow {
-  animation: neon-flicker-red 5s infinite;
+/* Неоновое мерцающее свечение для заголовков секций */
+.section-title,
+.about-heading {
+  font-family: 'Comfortaa', sans-serif;
+  font-weight: 700;
+  color: #ffffff;
+  animation: neon-glow-flicker 3.5s infinite;
+}
+
+@keyframes neon-glow-flicker {
+
+  0%,
+  18%,
+  22%,
+  25%,
+  53%,
+  57%,
+  100% {
+    text-shadow:
+      0 0 2px #ffffff,
+      0 0 6px #ffffff,
+      0 0 15px rgba(176, 38, 255, 0.9),
+      0 0 25px rgba(176, 38, 255, 0.8),
+      0 0 40px rgba(176, 38, 255, 0.6),
+      0 0 60px rgba(176, 38, 255, 0.4);
+  }
+
+  19%,
+  20%,
+  23%,
+  24%,
+  54%,
+  56% {
+    text-shadow:
+      0 0 1px #ffffff,
+      0 0 4px rgba(176, 38, 255, 0.4);
+  }
 }
