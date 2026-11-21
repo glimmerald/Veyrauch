@@ -1,4 +1,4 @@
-name: Build and Deploy to Beget
+name: Build and Deploy to Timeweb
 
 on:
   push:
@@ -35,21 +35,29 @@ jobs:
           GOOGLE_ANALYTICS_ID: ${{ secrets.GOOGLE_ANALYTICS_ID || 'G-PSR45G61DT' }}
         run: npm run generate
 
-      - name: 🚀 Sync to Beget Hosting via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      - name: 🔑 Setup SSH agent
+        uses: webfactory/ssh-agent@v0.9.0
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          # Обычно на Beget: veyrauch.ru/public_html/ или /public_html/
-          server-dir: ${{ secrets.FTP_TARGET_DIR || '/' }}
-          local-dir: .output/public/
-          # Не удаляем все файлы перед загрузкой, чтобы сайт не падал во время деплоя
-          dangerous-clean-slate: false
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/.DS_Store
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: 🚀 Sync to Timeweb Hosting via SSH (rsync)
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
+          SSH_TARGET_DIR: ${{ secrets.SSH_TARGET_DIR }}
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p "$SSH_PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts
+          # --checksum (-c): сравнивает файлы по содержимому, а не по времени сборки,
+          # поэтому крупные видеофайлы не перезаливаются заново при каждом билде.
+          # --delete-delay: удаляет с сервера только те файлы, которых больше нет в сборке.
+          rsync -avzc --omit-dir-times --delete-delay \
+            --exclude='.git*' \
+            --exclude='.DS_Store' \
+            -e "ssh -p $SSH_PORT" \
+            .output/public/ \
+            "$SSH_USER@$SSH_HOST:$SSH_TARGET_DIR"
 
       - name: 🔔 Notify Yandex via IndexNow (Быстрая перепроверка)
         run: |
