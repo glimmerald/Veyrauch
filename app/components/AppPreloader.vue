@@ -1,27 +1,29 @@
 <template>
-  <div class="preloader" ref="preloaderEl">
+  <div class="preloader" ref="preloaderEl" @click="skipPreloader" aria-hidden="true">
     <!-- SVG для струн -->
     <svg class="preloader-svg">
-      <path 
-        v-for="(path, index) in paths" 
+      <path
+        v-for="(path, index) in paths"
         :key="index"
-        :d="path" 
-        :stroke="colors[index]" 
-        stroke-width="3" 
-        fill="none" 
+        :d="path"
+        :stroke="colors[index]"
+        stroke-width="3"
+        fill="none"
         style="mix-blend-mode: screen;"
       />
     </svg>
-    
+
     <div class="text-container">
-      <span 
-        v-for="(letter, idx) in 'VEYRAUCH'.split('')" 
+      <span
+        v-for="(letter, idx) in 'VEYRAUCH'.split('')"
         :key="idx"
         class="glitch-letter"
       >
         {{ letter }}
       </span>
     </div>
+
+    <span class="skip-hint">Нажми, чтобы пропустить</span>
   </div>
 </template>
 
@@ -33,108 +35,133 @@ import gsap from 'gsap';
 const emit = defineEmits(['complete']);
 const preloaderEl = ref(null);
 
-const { paths, basePoints, amplitude, colors } = useStringWave({ closed: true, maxAmp: 40 });
+const { paths, basePoints, amplitude, colors } = useStringWave({ closed: true, maxAmp: 36, continuous: true });
 
 const frame = { top: 0, bottom: 0, left: 0, right: 0 };
 let tickerFunc = null;
-let tl = null; // Храним ссылку на timeline
+let tl = null;
+let finished = false;
+
+function finish() {
+  if (finished) return;
+  finished = true;
+  if (tl) tl.kill();
+  emit('complete');
+}
+
+function skipPreloader() {
+  finish();
+}
 
 function updatePoints() {
   const w = frame.right - frame.left;
   const h = frame.bottom - frame.top;
   const W = Math.max(w, 1);
   const H = Math.max(h, 1);
-  const numX = 30; const numY = 20;
-  
+  const numX = 30;
+  const numY = 20;
+
   const pts = [];
-  for(let i=0; i<numX; i++) pts.push({ x: frame.left + (i/numX)*W, y: frame.top, nx: 0, ny: -1, l: i/numX });
-  for(let i=0; i<numY; i++) pts.push({ x: frame.right, y: frame.top + (i/numY)*H, nx: 1, ny: 0, l: i/numY });
-  for(let i=0; i<numX; i++) pts.push({ x: frame.right - (i/numX)*W, y: frame.bottom, nx: 0, ny: 1, l: i/numX });
-  for(let i=0; i<numY; i++) pts.push({ x: frame.left, y: frame.bottom - (i/numY)*H, nx: -1, ny: 0, l: i/numY });
+  for (let i = 0; i < numX; i++) pts.push({ x: frame.left + (i / numX) * W, y: frame.top, nx: 0, ny: -1, l: i / numX });
+  for (let i = 0; i < numY; i++) pts.push({ x: frame.right, y: frame.top + (i / numY) * H, nx: 1, ny: 0, l: i / numY });
+  for (let i = 0; i < numX; i++) pts.push({ x: frame.right - (i / numX) * W, y: frame.bottom, nx: 0, ny: 1, l: i / numX });
+  for (let i = 0; i < numY; i++) pts.push({ x: frame.left, y: frame.bottom - (i / numY) * H, nx: -1, ny: 0, l: i / numY });
   basePoints.value = pts;
 }
 
 onMounted(() => {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    finish();
+    return;
+  }
+
   const winW = window.innerWidth;
   const winH = window.innerHeight;
-  
+
   frame.top = winH / 2;
   frame.bottom = winH / 2;
   frame.left = 0;
   frame.right = winW;
-  
+
   updatePoints();
   tickerFunc = () => updatePoints();
   gsap.ticker.add(tickerFunc);
-  
+
   tl = gsap.timeline({
     onComplete: () => {
-      emit('complete');
+      finish();
     }
   });
-  
+
   const isMobile = winW < 768;
-  
-  // Исходное состояние букв
-  gsap.set('.glitch-letter', { 
-    scaleY: 15, 
-    opacity: 0, 
-    filter: isMobile ? 'none' : 'blur(10px)', 
-    color: 'var(--neon-green)' 
+
+  gsap.set('.glitch-letter', {
+    scaleY: 12,
+    opacity: 0,
+    filter: isMobile ? 'none' : 'blur(8px)',
+    color: 'var(--neon-green)'
   });
-  
-  // 1. Струна вибрирует
-  tl.to(amplitude, { value: 0.2, duration: 1, ease: 'power2.inOut' });
-  tl.to(amplitude, { value: 1.5, duration: 0.5, ease: 'back.out(2)' });
-  
-  // 2. Глитч букв (Концепт 1)
-  tl.to('.glitch-letter', {
-    scaleY: 1,
-    opacity: 1,
-    filter: isMobile ? 'none' : 'blur(0px)',
-    color: 'var(--text-color)',
-    duration: 0.6,
-    stagger: 0.05,
-    ease: 'power4.out',
-    onStart: function() {
-      // Имитация хроматической аберрации
-      gsap.fromTo('.glitch-letter', 
-        { textShadow: '-10px 0 red, 10px 0 var(--neon-green)', x: -10 },
-        { textShadow: '0px 0 rgba(255,16,83,0.5)', x: 0, duration: 0.5, ease: 'elastic.out(1, 0.2)' }
-      );
-    }
-  }, "-=0.3");
-  
-  // 3. Струна успокаивается
-  tl.to(amplitude, { value: 0.3, duration: 1, ease: 'power2.out' }, "-=0.5");
-  
-  // 4. Обвитие рамки
-  tl.to(frame, {
-    top: 20,
-    bottom: winH - 20,
-    left: 20,
-    right: winW - 20,
-    duration: 1.5,
-    ease: 'power3.inOut'
-  }, "+=0.5");
-  tl.to(amplitude, { value: 1, duration: 1.5, ease: 'power2.inOut' }, "<");
-  
-  // 5. Улет букв на нас
-  tl.to('.text-container', {
-    scale: 20,
-    opacity: 0,
-    filter: isMobile ? 'none' : 'blur(20px)',
-    duration: 1.5,
-    ease: 'power4.in'
-  }, "+=0.2");
-  tl.to(amplitude, { value: 0.1, duration: 1, ease: 'power2.out' }, "<");
-  
-  // 6. Открытие контента
-  tl.to('.preloader', {
-    opacity: 0,
-    duration: 1,
-    ease: 'power2.inOut'
-  }, "+=0.2");
+
+  // Динамичное интро ~1.8 секунды (вместо ~7.2с) — сохраняет все эффекты без потери LCP/отказов
+  tl.to(amplitude, { value: 1.35, duration: 0.28, ease: 'back.out(2)' });
+
+  tl.to(
+    '.glitch-letter',
+    {
+      scaleY: 1,
+      opacity: 1,
+      filter: isMobile ? 'none' : 'blur(0px)',
+      color: 'var(--text-color)',
+      duration: 0.35,
+      stagger: 0.025,
+      ease: 'power4.out',
+      onStart: function () {
+        gsap.fromTo(
+          '.glitch-letter',
+          { textShadow: '-8px 0 red, 8px 0 var(--neon-green)', x: -6 },
+          { textShadow: '0px 0 rgba(255,16,83,0.5)', x: 0, duration: 0.28, ease: 'elastic.out(1, 0.25)' }
+        );
+      }
+    },
+    '-=0.15'
+  );
+
+  tl.to(
+    frame,
+    {
+      top: 20,
+      bottom: winH - 20,
+      left: 20,
+      right: winW - 20,
+      duration: 0.55,
+      ease: 'power3.inOut'
+    },
+    '-=0.05'
+  );
+  tl.to(amplitude, { value: 0.85, duration: 0.55, ease: 'power2.inOut' }, '<');
+
+  tl.to(
+    '.text-container',
+    {
+      scale: 16,
+      opacity: 0,
+      filter: isMobile ? 'none' : 'blur(14px)',
+      duration: 0.45,
+      ease: 'power4.in'
+    },
+    '+=0.05'
+  );
+  tl.to(amplitude, { value: 0.05, duration: 0.4, ease: 'power2.out' }, '<');
+
+  tl.to(
+    '.preloader',
+    {
+      opacity: 0,
+      duration: 0.3,
+      ease: 'power2.out'
+    },
+    '-=0.2'
+  );
 });
 
 onBeforeUnmount(() => {
@@ -146,20 +173,23 @@ onBeforeUnmount(() => {
 <style scoped>
 .preloader {
   position: fixed;
-  top: 0; left: 0;
-  width: 100vw; height: 100vh;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100dvh;
   background-color: var(--bg-color);
   z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  overflow: clip;
+  cursor: pointer;
 }
 
 .preloader-svg {
   position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
   pointer-events: none;
   z-index: 1;
 }
@@ -191,7 +221,18 @@ path {
 .glitch-letter {
   display: inline-block;
   transform-origin: center center;
-  /* Финальное неоновое свечение для текста */
   text-shadow: 0 0 20px rgba(255, 16, 83, 0.5);
+}
+
+.skip-hint {
+  position: absolute;
+  inset-block-end: 28px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+  z-index: 3;
+  pointer-events: none;
 }
 </style>

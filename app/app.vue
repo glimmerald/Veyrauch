@@ -5,15 +5,6 @@
 <script setup>
 import { useRuntimeConfig, useHead } from '#imports'
 
-useHead({
-  htmlAttrs: {
-    lang: 'ru'
-  },
-  link: [
-    { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }
-  ]
-})
-
 const config = useRuntimeConfig()
 const headScripts = []
 

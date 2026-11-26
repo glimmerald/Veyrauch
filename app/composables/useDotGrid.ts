@@ -156,16 +156,33 @@ export function useDotGrid(canvasRef: any) {
     rafId = requestAnimationFrame(update);
   }
 
+  function handleVisibilityChange() {
+    if (document.hidden) {
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+    } else if (!rafId) {
+      lastTime = 0;
+      rafId = requestAnimationFrame(update);
+    }
+  }
+
   onMounted(() => {
     resize();
-    window.addEventListener('resize', resize);
-    window.addEventListener('mousemove', onMouseMove);
-    update();
+    window.addEventListener('resize', resize, { passive: true });
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return;
+    }
+    window.addEventListener('mousemove', onMouseMove, { passive: true });
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    rafId = requestAnimationFrame(update);
   });
 
   onUnmounted(() => {
     window.removeEventListener('resize', resize);
     window.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
     if (rafId) cancelAnimationFrame(rafId);
   });
 }

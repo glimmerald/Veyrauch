@@ -1,45 +1,52 @@
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, watch, onMounted, onUnmounted } from 'vue';
 
 export function useStringWave(options: any = {}) {
   const colors = options.colors || ['#ff1053', '#b026ff', '#00ff73'];
   const maxAmp = options.maxAmp || 12;
   const closed = options.closed || false;
+  const continuous = options.continuous || false;
 
   const paths = ref(['', '', '']);
   const basePoints = ref<any[]>([]); // {x, y, nx, ny, l, envelope}
   const amplitude = ref(0);
 
   let time = 0;
-  let rafId: any = null;
+  let rafId: number | null = null;
+  let isMounted = false;
 
   function update() {
-    time += 0.025;
+    rafId = null;
+    if (!isMounted) return;
 
     const pts = basePoints.value;
+    const isActive = Math.abs(amplitude.value) > 0.001;
+
     if (!pts || pts.length === 0) {
-      rafId = requestAnimationFrame(update);
+      if (continuous || isActive) {
+        rafId = requestAnimationFrame(update);
+      }
       return;
     }
 
-    if (Math.abs(amplitude.value) > 0.001) {
+    if (isActive) {
+      time += 0.025;
       const newPaths = [];
       for (let c = 0; c < colors.length; c++) {
         let d = '';
-        let f1 = 2 + c * 0.5;
-        let f2 = 4 + c * 0.3;
-        let p1 = c * Math.PI / 3;
-        let p2 = c * Math.PI / 2;
+        const f1 = 2 + c * 0.5;
+        const f2 = 4 + c * 0.3;
+        const p1 = (c * Math.PI) / 3;
+        const p2 = (c * Math.PI) / 2;
 
         const displacedPoints = [];
         for (let i = 0; i < pts.length; i++) {
-          let p = pts[i];
-          // Если конверт передан, используем его, иначе синусоида от l
-          let envelope = p.envelope !== undefined ? p.envelope : Math.sin(p.l * Math.PI);
+          const p = pts[i];
+          const envelope = p.envelope !== undefined ? p.envelope : Math.sin(p.l * Math.PI);
 
-          let wave1 = Math.sin(time * f1 + p.l * Math.PI * 3 + p1);
-          let wave2 = 0.5 * Math.sin(time * f2 + p.l * Math.PI * 5 + p2);
+          const wave1 = Math.sin(time * f1 + p.l * Math.PI * 3 + p1);
+          const wave2 = 0.5 * Math.sin(time * f2 + p.l * Math.PI * 5 + p2);
 
-          let disp = envelope * (wave1 + wave2) * maxAmp * amplitude.value;
+          const disp = envelope * (wave1 + wave2) * maxAmp * amplitude.value;
 
           displacedPoints.push({
             x: p.x + p.nx * disp,
@@ -50,12 +57,12 @@ export function useStringWave(options: any = {}) {
         if (displacedPoints.length > 0) {
           d += `M ${displacedPoints[0].x} ${displacedPoints[0].y} `;
           for (let i = 1; i < displacedPoints.length - 1; i++) {
-            let xc = (displacedPoints[i].x + displacedPoints[i + 1].x) / 2;
-            let yc = (displacedPoints[i].y + displacedPoints[i + 1].y) / 2;
+            const xc = (displacedPoints[i].x + displacedPoints[i + 1].x) / 2;
+            const yc = (displacedPoints[i].y + displacedPoints[i + 1].y) / 2;
             d += `Q ${displacedPoints[i].x} ${displacedPoints[i].y} ${xc} ${yc} `;
           }
           if (displacedPoints.length > 1) {
-            let last = displacedPoints[displacedPoints.length - 1];
+            const last = displacedPoints[displacedPoints.length - 1];
             d += `L ${last.x} ${last.y} `;
           }
         }
@@ -63,29 +70,45 @@ export function useStringWave(options: any = {}) {
         newPaths.push(d);
       }
       paths.value = newPaths;
-    } else if (paths.value[0] !== '') {
-      paths.value = ['', '', ''];
+      rafId = requestAnimationFrame(update);
+    } else {
+      if (paths.value[0] !== '') {
+        paths.value = ['', '', ''];
+      }
+      if (continuous) {
+        rafId = requestAnimationFrame(update);
+      }
     }
-
-    rafId = requestAnimationFrame(update);
   }
 
   function start() {
-    if (!rafId) update();
+    if (isMounted && rafId === null) {
+      rafId = requestAnimationFrame(update);
+    }
   }
 
   function stop() {
-    if (rafId) {
+    if (rafId !== null) {
       cancelAnimationFrame(rafId);
       rafId = null;
     }
   }
 
+  watch(amplitude, (val) => {
+    if (Math.abs(val) > 0.001) {
+      start();
+    }
+  });
+
   onMounted(() => {
-    start();
+    isMounted = true;
+    if (continuous || Math.abs(amplitude.value) > 0.001) {
+      start();
+    }
   });
 
   onUnmounted(() => {
+    isMounted = false;
     stop();
   });
 

@@ -68,7 +68,7 @@ function acceptCookies() {
 
 .cookie-text {
   color: rgba(255, 255, 255, 0.8);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Manrope', sans-serif;
   font-size: 0.85rem;
   line-height: 1.5;
   margin: 0;
@@ -85,7 +85,7 @@ function acceptCookies() {
   border: 1px solid rgba(255, 42, 95, 0.5);
   padding: 6px 20px;
   border-radius: 6px;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Manrope', sans-serif;
   font-size: 0.85rem;
   font-weight: 500;
   cursor: pointer;

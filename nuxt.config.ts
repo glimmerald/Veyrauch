@@ -15,7 +15,7 @@ export default defineNuxtConfig({
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
         {
           rel: 'stylesheet',
-          href: 'https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Tektur:wght@400;500;600;700;800&family=Unbounded:wght@400;500;700;900&display=swap'
+          href: 'https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&family=Manrope:wght@400;500;600;700;800&family=Outfit:wght@300;400;600;800&family=Tektur:wght@400;500;600;700;800&family=Unbounded:wght@400;500;700;900&display=swap'
         }
       ]
     }
@@ -28,7 +28,9 @@ export default defineNuxtConfig({
 
   site: {
     url: 'https://veyrauch.ru',
-    name: 'Veyrauch Cover Dance',
+    name: 'Школа K-pop танцев Veyrauch',
+    description: 'Школа K-pop танцев в центре Краснодара (ул. Володи Головатого, 274, р-н ТРЦ Галерея). Обучение cover dance с нуля в мини-группах, пробное занятие от 400 ₽.',
+    defaultLocale: 'ru',
     indexable: true
   },
 

@@ -1,21 +1,23 @@
 <template>
-  <component 
+  <component
     :is="href ? 'a' : 'button'"
     :href="href"
     :target="target"
-    class="string-wave-btn" 
+    :rel="computedRel"
+    class="string-wave-btn"
     ref="btn"
-    @mouseenter="onEnter" 
+    @mouseenter="onEnter"
     @mouseleave="onLeave"
+    @click="onClick"
   >
-    <svg class="wave-svg" v-if="width > 0">
-      <path 
-        v-for="(path, index) in paths" 
+    <svg class="wave-svg" v-if="width > 0 && paths[0]">
+      <path
+        v-for="(path, index) in paths"
         :key="index"
-        :d="path" 
-        :stroke="colors[index]" 
-        stroke-width="2" 
-        fill="none" 
+        :d="path"
+        :stroke="colors[index]"
+        stroke-width="2"
+        fill="none"
         style="mix-blend-mode: screen;"
       />
     </svg>
@@ -24,13 +26,23 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { useStringWave } from '../composables/useStringWave';
+import { useAnalytics } from '../composables/useAnalytics';
 
 const props = defineProps({
   href: { type: String, default: null },
-  target: { type: String, default: null }
+  target: { type: String, default: null },
+  rel: { type: String, default: null },
+  goal: { type: String, default: null }
 });
-import { useStringWave } from '../composables/useStringWave';
+
+const computedRel = computed(() => {
+  if (props.rel) return props.rel;
+  return props.target === '_blank' ? 'noopener noreferrer' : null;
+});
+
+const { trackGoal } = useAnalytics();
 
 const btn = ref(null);
 const width = ref(0);
@@ -42,24 +54,46 @@ let isHovered = false;
 let velocity = 0;
 let rafId = null;
 
-const onEnter = () => { isHovered = true; };
-const onLeave = () => { isHovered = false; };
+function startPhysics() {
+  if (rafId === null) {
+    rafId = requestAnimationFrame(updatePhysics);
+  }
+}
+
+const onEnter = () => {
+  isHovered = true;
+  startPhysics();
+};
+
+const onLeave = () => {
+  isHovered = false;
+  startPhysics();
+};
+
+const onClick = () => {
+  if (props.goal) {
+    trackGoal(props.goal);
+  }
+  if (props.href && props.href.includes('t.me/')) {
+    trackGoal('click_telegram', { placement: props.goal || 'cta' });
+  }
+};
 
 function initPoints() {
   if (!btn.value) return;
   const rect = btn.value.getBoundingClientRect();
   width.value = rect.width;
   height.value = rect.height;
-  
-  const numX = Math.floor(width.value / 1.5); 
-  const numY = Math.floor(height.value / 1.5);
-  
+
+  const numX = Math.max(Math.floor(width.value / 2.5), 1);
+  const numY = Math.max(Math.floor(height.value / 2.5), 1);
+
   const pts = [];
-  for(let i=0; i<numX; i++) pts.push({ x: (i/numX)*width.value, y: 0, nx: 0, ny: -1, l: i/numX });
-  for(let i=0; i<numY; i++) pts.push({ x: width.value, y: (i/numY)*height.value, nx: 1, ny: 0, l: i/numY });
-  for(let i=0; i<numX; i++) pts.push({ x: width.value - (i/numX)*width.value, y: height.value, nx: 0, ny: 1, l: i/numX });
-  for(let i=0; i<numY; i++) pts.push({ x: 0, y: height.value - (i/numY)*height.value, nx: -1, ny: 0, l: i/numY });
-  
+  for (let i = 0; i < numX; i++) pts.push({ x: (i / numX) * width.value, y: 0, nx: 0, ny: -1, l: i / numX });
+  for (let i = 0; i < numY; i++) pts.push({ x: width.value, y: (i / numY) * height.value, nx: 1, ny: 0, l: i / numY });
+  for (let i = 0; i < numX; i++) pts.push({ x: width.value - (i / numX) * width.value, y: height.value, nx: 0, ny: 1, l: i / numX });
+  for (let i = 0; i < numY; i++) pts.push({ x: 0, y: height.value - (i / numY) * height.value, nx: -1, ny: 0, l: i / numY });
+
   basePoints.value = pts;
 }
 
@@ -70,7 +104,14 @@ function updatePhysics() {
   const force = (target - amplitude.value) * stiffness - velocity * damping;
   velocity += force;
   amplitude.value += velocity;
-  
+
+  if (!isHovered && Math.abs(amplitude.value) < 0.001 && Math.abs(velocity) < 0.001) {
+    amplitude.value = 0;
+    velocity = 0;
+    rafId = null;
+    return;
+  }
+
   rafId = requestAnimationFrame(updatePhysics);
 }
 
@@ -84,8 +125,7 @@ onMounted(() => {
     });
     resizeObserver.observe(btn.value);
   }
-  window.addEventListener('resize', initPoints);
-  rafId = requestAnimationFrame(updatePhysics);
+  window.addEventListener('resize', initPoints, { passive: true });
 });
 
 onBeforeUnmount(() => {
@@ -94,7 +134,10 @@ onBeforeUnmount(() => {
     resizeObserver.disconnect();
   }
   window.removeEventListener('resize', initPoints);
-  if (rafId) cancelAnimationFrame(rafId);
+  if (rafId !== null) {
+    cancelAnimationFrame(rafId);
+    rafId = null;
+  }
 });
 </script>
 
@@ -117,8 +160,8 @@ onBeforeUnmount(() => {
   text-transform: uppercase;
   cursor: pointer;
   transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.1s ease;
-  overflow: visible; 
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2); 
+  overflow: visible;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
   max-width: 100%;
   box-sizing: border-box;
 }
@@ -156,7 +199,7 @@ onBeforeUnmount(() => {
 
 .string-wave-btn:hover {
   background: rgba(20, 20, 20, 0.8);
-  box-shadow: inset 0 0 0 1px transparent; 
+  box-shadow: inset 0 0 0 1px transparent;
 }
 
 .string-wave-btn:active {
@@ -170,8 +213,8 @@ onBeforeUnmount(() => {
 
 .btn-text {
   position: relative;
-  z-index: 2; 
-  padding-left: 2px; /* Compensate for letter-spacing to center text */
+  z-index: 2;
+  padding-left: 2px;
 }
 
 .wave-svg {

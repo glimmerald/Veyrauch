@@ -1,28 +1,33 @@
 <template>
-  <div 
-    class="faq-accordion" 
+  <div
+    class="faq-accordion"
     ref="container"
-    @mouseenter="onEnter" 
+    role="button"
+    tabindex="0"
+    :aria-expanded="isOpen"
+    @mouseenter="onEnter"
     @mouseleave="onLeave"
     @click="toggle"
+    @keydown.enter.prevent="toggle"
+    @keydown.space.prevent="toggle"
   >
-    <svg class="wave-svg" v-if="width > 0">
-      <path 
-        v-for="(path, index) in paths" 
+    <svg class="wave-svg" v-if="width > 0 && paths[0]">
+      <path
+        v-for="(path, index) in paths"
         :key="index"
-        :d="path" 
-        :stroke="colors[index]" 
-        stroke-width="2" 
-        fill="none" 
+        :d="path"
+        :stroke="colors[index]"
+        stroke-width="2"
+        fill="none"
         style="mix-blend-mode: screen;"
       />
     </svg>
     <div class="faq-content">
       <div class="faq-header">
         <h3 class="faq-question">{{ question }}</h3>
-        <div class="faq-icon" :class="{ 'is-open': isOpen }">
+        <div class="faq-icon" :class="{ 'is-open': isOpen }" aria-hidden="true">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M6 9l6 6 6-6"/>
+            <path d="M6 9l6 6 6-6" />
           </svg>
         </div>
       </div>
@@ -39,7 +44,7 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { useStringWave } from '../composables/useStringWave';
 
-const props = defineProps({
+defineProps({
   question: String,
   answer: String
 });
@@ -56,18 +61,28 @@ let velocity = 0;
 let rafId = null;
 let targetAmplitude = 0;
 
-const onEnter = () => { 
-  isHovered = true; 
+function startPhysics() {
+  if (rafId === null) {
+    rafId = requestAnimationFrame(updatePhysics);
+  }
+}
+
+const onEnter = () => {
+  isHovered = true;
   targetAmplitude = 0.4;
+  startPhysics();
 };
-const onLeave = () => { 
-  isHovered = false; 
-  targetAmplitude = 0; 
+
+const onLeave = () => {
+  isHovered = false;
+  targetAmplitude = 0;
+  startPhysics();
 };
 
 const toggle = () => {
   isOpen.value = !isOpen.value;
-  velocity += 0.5; 
+  velocity += 0.5;
+  startPhysics();
 };
 
 function initPoints() {
@@ -75,17 +90,17 @@ function initPoints() {
   const rect = container.value.getBoundingClientRect();
   width.value = rect.width;
   height.value = rect.height;
-  
+
   const step = 4;
-  const numX = Math.floor(width.value / step) || 1; 
+  const numX = Math.floor(width.value / step) || 1;
   const numY = Math.floor(height.value / step) || 1;
-  
+
   const pts = [];
-  for(let i=0; i<numX; i++) pts.push({ x: (i/numX)*width.value, y: 0, nx: 0, ny: -1, l: i/numX });
-  for(let i=0; i<numY; i++) pts.push({ x: width.value, y: (i/numY)*height.value, nx: 1, ny: 0, l: i/numY });
-  for(let i=0; i<numX; i++) pts.push({ x: width.value - (i/numX)*width.value, y: height.value, nx: 0, ny: 1, l: i/numX });
-  for(let i=0; i<numY; i++) pts.push({ x: 0, y: height.value - (i/numY)*height.value, nx: -1, ny: 0, l: i/numY });
-  
+  for (let i = 0; i < numX; i++) pts.push({ x: (i / numX) * width.value, y: 0, nx: 0, ny: -1, l: i / numX });
+  for (let i = 0; i < numY; i++) pts.push({ x: width.value, y: (i / numY) * height.value, nx: 1, ny: 0, l: i / numY });
+  for (let i = 0; i < numX; i++) pts.push({ x: width.value - (i / numX) * width.value, y: height.value, nx: 0, ny: 1, l: i / numX });
+  for (let i = 0; i < numY; i++) pts.push({ x: 0, y: height.value - (i / numY) * height.value, nx: -1, ny: 0, l: i / numY });
+
   basePoints.value = pts;
 }
 
@@ -95,7 +110,14 @@ function updatePhysics() {
   const force = (targetAmplitude - amplitude.value) * stiffness - velocity * damping;
   velocity += force;
   amplitude.value += velocity;
-  
+
+  if (!isHovered && Math.abs(amplitude.value) < 0.001 && Math.abs(velocity) < 0.001) {
+    amplitude.value = 0;
+    velocity = 0;
+    rafId = null;
+    return;
+  }
+
   rafId = requestAnimationFrame(updatePhysics);
 }
 
@@ -109,8 +131,7 @@ onMounted(() => {
     });
     resizeObserver.observe(container.value);
   }
-  window.addEventListener('resize', initPoints);
-  rafId = requestAnimationFrame(updatePhysics);
+  window.addEventListener('resize', initPoints, { passive: true });
 });
 
 onBeforeUnmount(() => {
@@ -119,7 +140,10 @@ onBeforeUnmount(() => {
     resizeObserver.disconnect();
   }
   window.removeEventListener('resize', initPoints);
-  if (rafId) cancelAnimationFrame(rafId);
+  if (rafId !== null) {
+    cancelAnimationFrame(rafId);
+    rafId = null;
+  }
 });
 </script>
 
@@ -131,14 +155,19 @@ onBeforeUnmount(() => {
   padding: 0;
   cursor: pointer;
   transition: background 0.3s ease;
-  overflow: visible; 
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2); 
-  margin-bottom: 20px;
+  overflow: visible;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
 }
 
-.faq-accordion:hover {
+.faq-accordion:hover,
+.faq-accordion:focus-visible {
   background: rgba(20, 20, 20, 0.8);
-  box-shadow: inset 0 0 0 1px transparent; 
+  box-shadow: inset 0 0 0 1px transparent;
+  outline: none;
+}
+
+.faq-accordion:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--neon-purple);
 }
 
 .faq-content {
@@ -166,7 +195,9 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
+
 .faq-icon.is-open {
   transform: rotate(180deg);
 }
@@ -176,6 +207,7 @@ onBeforeUnmount(() => {
   grid-template-rows: 0fr;
   transition: grid-template-rows 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }
+
 .faq-answer-wrapper.is-open {
   grid-template-rows: 1fr;
 }
@@ -189,8 +221,8 @@ onBeforeUnmount(() => {
   padding-top: 15px;
   font-family: 'Manrope', sans-serif;
   font-size: 1rem;
-  line-height: 1.5;
-  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.82);
 }
 
 .wave-svg {

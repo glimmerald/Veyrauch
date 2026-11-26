@@ -32,28 +32,33 @@ onMounted(() => {
   // Получаем видео из запроса, если пусто — пустой массив
   const videosArray = fetchedVideos.value || []
   
-  // Перемешиваем видео и размеры при каждой загрузке страницы
   const shuffledVideos = shuffle([...videosArray]);
   const shuffledSizes = shuffle([...sizesDistribution]);
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   
   galleryItems.value = shuffledVideos.map((src, index) => {
+    const fileName = src.split('/').pop() || '';
+    const baseName = fileName.replace(/\.[^.]+$/, '');
     return {
       src,
+      poster: baseName ? `/posters/${baseName}.jpg` : undefined,
       size: shuffledSizes[index % shuffledSizes.length]
     }
   });
 
   // Запускаем Observer после того, как DOM обновится
   nextTick(() => {
+    if (prefersReducedMotion) return;
+
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          entry.target.play().catch(e => console.log('Autoplay blocked:', e))
+          entry.target.play().catch(() => {})
         } else {
           entry.target.pause()
         }
       })
-    }, { threshold: 0.1 })
+    }, { threshold: 0.15 })
 
     videoRefs.value.forEach(video => {
       if (video) observer.observe(video)
@@ -63,8 +68,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <section class="section section--gallery">
+  <section id="gallery" class="section section--gallery">
     <SectionHeading>Галерея</SectionHeading>
+    <div class="container gallery-intro-wrap">
+      <p class="gallery-intro">
+        Фрагменты наших танцевальных связок, репетиций и cover dance постановок. На каждом занятии мы снимаем выученный
+        кусочек хореографии на видео, чтобы ты видела свой рост и могла повторять движения дома.
+      </p>
+    </div>
     
     <!-- ClientOnly предотвращает ошибки гидратации (SSR), так как мы используем Math.random() -->
     <ClientOnly>
@@ -78,7 +89,11 @@ onMounted(() => {
           >
             <video 
               ref="videoRefs"
-              :src="item.src" 
+              :src="item.src"
+              :poster="item.poster"
+              width="480"
+              height="854"
+              loading="lazy"
               class="gallery-video"
               loop 
               muted 
@@ -102,6 +117,18 @@ onMounted(() => {
   flex-direction: column;
   background-color: transparent;
   overflow: hidden;
+}
+
+.gallery-intro-wrap {
+  margin-block-end: 26px;
+}
+
+.gallery-intro {
+  font-family: 'Manrope', sans-serif;
+  font-size: clamp(0.96rem, 1.7vw, 1.12rem);
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.8);
+  max-width: 780px;
 }
 
 .gallery-scroll-wrapper {

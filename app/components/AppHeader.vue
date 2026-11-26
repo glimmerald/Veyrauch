@@ -1,14 +1,23 @@
 <template>
   <header class="app-header" :class="{ 'is-scrolled': isScrolled }">
-    <div class="logo">VEYRAUCH</div>
+    <a href="#" class="logo" aria-label="Школа K-pop танцев Veyrauch — наверх">VEYRAUCH</a>
+
+    <nav class="header-nav" aria-label="Навигация по разделам">
+      <a href="#about" class="nav-link">О тренере</a>
+      <a href="#format" class="nav-link">Формат и группы</a>
+      <a href="#prices" class="nav-link">Цены</a>
+      <a href="#location" class="nav-link">Адрес</a>
+      <a href="#faq" class="nav-link">Вопросы</a>
+    </nav>
+
     <div class="header-actions">
-      <a href="tel:+79058583082" class="header-phone" aria-label="Позвонить: +7 905 858-30-82">
+      <a href="tel:+79058583082" class="header-phone" aria-label="Позвонить: +7 905 858-30-82" @click="trackGoal('click_phone', { placement: 'header' })">
         <svg class="phone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
         </svg>
         <span class="phone-text">+7 905 858-30-82</span>
       </a>
-      <StringWaveButton class="book-btn" :href="'https://t.me/jsmjm?text=' + encodeURIComponent('Здравствуйте! Хочу записаться на пробное занятие.')" target="_blank">Записаться</StringWaveButton>
+      <StringWaveButton class="book-btn" goal="tg_header" :href="'https://t.me/jsmjm?text=' + encodeURIComponent('Здравствуйте! Хочу записаться на пробное занятие.')" target="_blank">Записаться</StringWaveButton>
     </div>
   </header>
 </template>
@@ -16,6 +25,9 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 import StringWaveButton from './StringWaveButton.vue';
+import { useAnalytics } from '../composables/useAnalytics';
+
+const { trackGoal } = useAnalytics();
 
 const isScrolled = ref(false);
 
@@ -55,6 +67,10 @@ onUnmounted(() => {
 .app-header.is-scrolled {
   padding-top: 15px;
   padding-bottom: 15px;
+  background: rgba(5, 5, 8, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .logo {
@@ -63,12 +79,34 @@ onUnmounted(() => {
   font-weight: 900;
   letter-spacing: 2px;
   color: var(--text-color);
+  text-decoration: none;
   text-transform: uppercase;
   text-shadow: 0 0 15px rgba(255, 16, 83, 0.4);
   cursor: pointer;
   transition: font-size 0.6s cubic-bezier(0.25, 1, 0.5, 1);
   white-space: nowrap;
   flex-shrink: 0;
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.nav-link {
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.78);
+  text-decoration: none;
+  transition: color 0.25s ease, text-shadow 0.25s ease;
+  white-space: nowrap;
+}
+
+.nav-link:hover {
+  color: #fff;
+  text-shadow: 0 0 10px rgba(176, 38, 255, 0.65);
 }
 
 .app-header.is-scrolled .logo {
@@ -111,6 +149,12 @@ onUnmounted(() => {
 .header-phone:hover {
   color: #ff1053;
   text-shadow: 0 0 10px rgba(255, 16, 83, 0.4);
+}
+
+@media (max-width: 1120px) {
+  .header-nav {
+    display: none;
+  }
 }
 
 @media (max-width: 1024px) {
